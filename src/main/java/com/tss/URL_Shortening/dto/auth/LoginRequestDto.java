@@ -1,4 +1,18 @@
 package com.tss.URL_Shortening.dto.auth;
 
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class LoginRequestDto {
+
+    @NotBlank(message = "Username is required")
+    private String userName;
+
+    @NotBlank(message = "Password is required")
+    private String password;
 }
