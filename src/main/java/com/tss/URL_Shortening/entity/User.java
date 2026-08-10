@@ -1,6 +1,5 @@
 package com.tss.URL_Shortening.entity;
 
-import com.tss.URL_Shortening.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,7 +21,7 @@ public class User {
     private Long userId;
 
     @Column(name = "name", nullable = false, length = 100)
-    private String name;
+    private String userName;
 
     @Column(name = "email", nullable = false, unique = true, length = 255)
     private String email;
@@ -32,10 +31,6 @@ public class User {
 
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false, length = 20)
-    private Role role;
 
     @Column(name = "email_verified", nullable = false)
     private Boolean emailVerified;
@@ -51,6 +46,10 @@ public class User {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<ShortUrl> shortUrls = new ArrayList<>();
