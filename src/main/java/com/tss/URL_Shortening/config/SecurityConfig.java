@@ -47,7 +47,13 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable()).cors(withDefaults());
         http.sessionManagement(session -> session.sessionCreationPolicy(STATELESS));
 
-        http.authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+        http.authorizeHttpRequests(auth -> auth.requestMatchers(
+                "/api/v1/auth/register",
+                        "/api/v1/auth/login",
+                        "/api/v1/auth/verify-email",
+                        "/api/v1/auth/forgot-password",
+                        "/api/v1/auth/reset-password"
+                ).permitAll()
                 .requestMatchers("/api/**").authenticated().anyRequest().authenticated());
 
         http.exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint));

@@ -1,36 +1,84 @@
 package com.tss.URL_Shortening.controller;
 
-import com.tss.URL_Shortening.dto.auth.RegisterRequestDto;
+import com.tss.URL_Shortening.dto.auth.*;
 import com.tss.URL_Shortening.dto.user.UserResponseDto;
+import com.tss.URL_Shortening.service.AuthService;
 import com.tss.URL_Shortening.service.AuthServiceImpl;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
 
-    private final AuthServiceImpl authServiceImpl;
+    private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDto> register(@RequestBody RegisterRequestDto registrationDto) {
+    public ResponseEntity<UserResponseDto> register(
+            @Valid @RequestBody RegisterRequestDto request) {
 
-        UserResponseDto response = authenticationService.register(registrationDto);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
+        return ResponseEntity.ok(
+                authService.register(request)
+        );
+    }
+
+    @GetMapping("/verify-email")
+    public ResponseEntity<String> verifyEmail(@Valid @RequestParam VerifyEmailRequestDto requestDto) {
+
+        authService.verifyEmail(requestDto);
+
+        return ResponseEntity.ok("Email verified successfully");
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto request) {
 
-        String token = authenticationService.login(loginDto);
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(
+                authService.login(request)
+        );
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authorizationHeader) {
+
+        authService.logout(authorizationHeader);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordRequestDto request) {
+
+        authService.forgotPassword(request);
+
+        return ResponseEntity.ok(
+                "Password reset instructions sent successfully"
+        );
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequestDto request) {
+
+        authService.resetPassword(request);
+
+        return ResponseEntity.ok(
+                "Password reset successfully"
+        );
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePasswordRequestDto request
+            , Authentication authentication) {
+
+        authService.changePassword(request,authentication);
+
+        return ResponseEntity.ok(
+                "Password changed successfully"
+        );
     }
 }

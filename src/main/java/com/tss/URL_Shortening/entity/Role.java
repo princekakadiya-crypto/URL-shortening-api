@@ -21,7 +21,7 @@ public class Role {
     private Long roleId;
 
     @Column
-    private com.tss.URL_Shortening.enums.Role role;
+    private String roleName;
 
     @OneToMany(mappedBy = "role")
     private List<User> users;
