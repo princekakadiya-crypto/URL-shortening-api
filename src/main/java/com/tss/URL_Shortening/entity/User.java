@@ -26,9 +26,6 @@ public class User {
     @Column(name = "email", nullable = false, unique = true, length = 255)
     private String email;
 
-    @Column(name = "mobile", unique = true, length = 20)
-    private String mobile;
-
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
 
@@ -71,4 +68,26 @@ public class User {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "updatedBy")
     private List<SystemConfig> systemConfigs = new ArrayList<>();
+
+    @PrePersist
+    protected void onCreate() {
+
+        LocalDateTime now = LocalDateTime.now();
+        createdAt = now;
+        updatedAt = now;
+        if (emailVerified == null) {
+            emailVerified = false;
+        }
+        if (remainingUrlSlots == null) {
+            remainingUrlSlots = 5;
+        }
+        if (isActive == null) {
+            isActive = true;
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }
