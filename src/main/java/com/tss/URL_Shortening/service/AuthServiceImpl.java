@@ -4,12 +4,14 @@ import com.tss.URL_Shortening.dto.auth.*;
 import com.tss.URL_Shortening.dto.user.UserResponseDto;
 import com.tss.URL_Shortening.entity.OtpVerification;
 import com.tss.URL_Shortening.entity.Role;
+import com.tss.URL_Shortening.entity.TokenBlacklist;
 import com.tss.URL_Shortening.entity.User;
 import com.tss.URL_Shortening.enums.OtpPurpose;
 import com.tss.URL_Shortening.exception.*;
 import com.tss.URL_Shortening.mapper.UserMapper;
 import com.tss.URL_Shortening.repository.OtpVerificationRepository;
 import com.tss.URL_Shortening.repository.RoleRepository;
+import com.tss.URL_Shortening.repository.TokenBlacklistRepository;
 import com.tss.URL_Shortening.repository.UserRepository;
 import com.tss.URL_Shortening.security.JwtTokenProvider;
 import jakarta.transaction.Transactional;
@@ -21,6 +23,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -36,6 +41,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final OtpVerificationRepository otpVerificationRepository;
     private final EmailService emailService;
+    private final TokenBlacklistRepository tokenBlacklistRepository;
 
     @Override
     @Transactional
@@ -120,8 +126,45 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void logout(String authorizationHeader) {
+    @Transactional
+    public void logout(String token) {
 
+        if (token == null || token.isBlank()) {
+            throw new InvalidCredentialException("Token is required");
+        }
+
+        // Remove "Bearer " if it is passed with the token
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+
+        // Validate JWT
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new InvalidCredentialException("Invalid or expired token");
+        }
+
+        // Get user from JWT
+        String username = jwtTokenProvider.getUsername(token);
+
+        User user = userRepository
+                .findByUserName(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        // Hash token before storing
+        String tokenHash = hashToken(token);
+
+        // Prevent duplicate blacklist entry
+        if (tokenBlacklistRepository.existsByTokenHash(tokenHash)) {
+            return;
+        }
+
+        TokenBlacklist tokenBlacklist = new TokenBlacklist();
+        tokenBlacklist.setTokenHash(tokenHash);
+        tokenBlacklist.setExpiresAt(jwtTokenProvider.getExpirationDateFromToken(token));
+        tokenBlacklist.setBlacklistedAt(LocalDateTime.now());
+        tokenBlacklist.setUser(user);
+
+        tokenBlacklistRepository.save(tokenBlacklist);
     }
 
     @Override
@@ -203,5 +246,25 @@ public class AuthServiceImpl implements AuthService {
 
     private String generateOtp() {
         return String.format("%06d", new SecureRandom().nextInt(1_000_000));
+    }
+
+    private String hashToken(String token) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(token.getBytes(StandardCharsets.UTF_8));
+
+            StringBuilder hexString = new StringBuilder();
+
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 algorithm not available", e);
+        }
     }
 }
