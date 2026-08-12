@@ -8,6 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 @Component
@@ -56,7 +58,14 @@ public class JwtTokenProvider {
 
     public String getUsername(String token) {
         Claims claims =Jwts.parser().verifyWith(key()).build().parseSignedClaims(token).getPayload();
-        String username = claims.getSubject();
-        return username;
+        return claims.getSubject();
+    }
+    public LocalDateTime getExpirationDateFromToken(String token) {
+
+        Claims claims = Jwts.parser().verifyWith(key()).build().parseSignedClaims(token).getPayload();
+
+        Date expiration = claims.getExpiration();
+
+        return expiration.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 }

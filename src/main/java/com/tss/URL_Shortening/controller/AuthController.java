@@ -2,6 +2,7 @@ package com.tss.URL_Shortening.controller;
 
 import com.tss.URL_Shortening.dto.auth.*;
 import com.tss.URL_Shortening.dto.user.UserResponseDto;
+import com.tss.URL_Shortening.exception.InvalidCredentialException;
 import com.tss.URL_Shortening.service.AuthService;
 import com.tss.URL_Shortening.service.AuthServiceImpl;
 import jakarta.validation.Valid;
@@ -44,11 +45,15 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<String> logout(@RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
+
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            throw new InvalidCredentialException("Authorization token is required");
+        }
 
         authService.logout(authorizationHeader);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Logout successful");
     }
 
     @PostMapping("/forgot-password")
