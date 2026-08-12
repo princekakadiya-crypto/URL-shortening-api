@@ -6,10 +6,7 @@ import com.tss.URL_Shortening.entity.OtpVerification;
 import com.tss.URL_Shortening.entity.Role;
 import com.tss.URL_Shortening.entity.User;
 import com.tss.URL_Shortening.enums.OtpPurpose;
-import com.tss.URL_Shortening.exception.DuplicateResourceException;
-import com.tss.URL_Shortening.exception.InvalidCredentialException;
-import com.tss.URL_Shortening.exception.InvalidOperationException;
-import com.tss.URL_Shortening.exception.ResourceNotFoundException;
+import com.tss.URL_Shortening.exception.*;
 import com.tss.URL_Shortening.mapper.UserMapper;
 import com.tss.URL_Shortening.repository.OtpVerificationRepository;
 import com.tss.URL_Shortening.repository.RoleRepository;
@@ -113,16 +110,8 @@ public class AuthServiceImpl implements AuthService {
         }
 
         OtpVerification otpVerification = otpVerificationRepository.findValidLatestOtp(
-                user.getUserId(), requestDto.getOtp(), OtpPurpose.EMAIL_VERIFICATION.name())
-                .orElseThrow(() -> new InvalidCredentialException("Invalid OTP"));
-
-        if (otpVerification.getVerifiedAt()!=null) {
-            throw new InvalidCredentialException("OTP has already been used");
-        }
-
-        if (otpVerification.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new InvalidCredentialException("OTP has expired");
-        }
+                user.getUserId(),OtpPurpose.EMAIL_VERIFICATION.name())
+                .orElseThrow(() -> new InvalidCredentialException("Invalid Otp"));
 
         user.setEmailVerified(true);
 
@@ -173,20 +162,11 @@ public class AuthServiceImpl implements AuthService {
     public void resetPassword(ResetPasswordRequestDto requestDto) {
 
         User user = userRepository.findByEmail(requestDto.getEmail())
-                .orElseThrow(() -> new InvalidCredentialException("Invalid email or OTP"));
+                .orElseThrow(() -> new InvalidCredentialException("Invalid email"));
 
-        OtpVerification otpVerification =
-                otpVerificationRepository
-                        .findValidLatestOtp(user.getUserId(), requestDto.getOtp(), OtpPurpose.PASSWORD_RESET.name())
-                        .orElseThrow(() -> new InvalidCredentialException("Invalid email or OTP"));
-
-        if (otpVerification.getVerifiedAt()!=null) {
-            throw new InvalidCredentialException("OTP has already been used");
-        }
-
-        if (otpVerification.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new InvalidCredentialException("OTP has expired");
-        }
+        OtpVerification otpVerification = otpVerificationRepository
+                .findValidLatestOtp(user.getUserId(), OtpPurpose.PASSWORD_RESET.name())
+                .orElseThrow(() -> new InvalidOtpException("Invalid Otp"));
 
         // Change password
         user.setPasswordHash(passwordEncoder.encode(requestDto.getNewPassword()));

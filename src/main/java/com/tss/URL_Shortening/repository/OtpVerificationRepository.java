@@ -11,19 +11,18 @@ import java.util.Optional;
 @Repository
 public interface OtpVerificationRepository extends JpaRepository<OtpVerification, Long> {
     @Query(value = """
-        SELECT *
-        FROM otp_verifications
-        WHERE user_id = :userId
-          AND otp = :otp
-          AND otp_type = :otpType
-          AND used = false
-          AND expires_at > CURRENT_TIMESTAMP
-        ORDER BY created_at DESC
-        LIMIT 1
-        """, nativeQuery = true)
+    SELECT *
+    FROM otp_verifications
+    WHERE user_id = :userId
+      AND purpose = :purpose
+      AND verified_at IS NULL
+      AND expires_at > CURRENT_TIMESTAMP
+      AND attempts < max_attempts
+    ORDER BY created_at DESC
+    LIMIT 1
+    """, nativeQuery = true)
     Optional<OtpVerification> findValidLatestOtp(
             @Param("userId") Long userId,
-            @Param("otp") String otp,
-            @Param("otpType") String otpType
+            @Param("purpose") String purpose
     );
 }
