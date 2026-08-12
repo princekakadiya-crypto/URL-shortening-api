@@ -56,9 +56,7 @@ public class AuthController {
 
         authService.forgotPassword(request);
 
-        return ResponseEntity.ok(
-                "Password reset instructions sent successfully"
-        );
+        return ResponseEntity.ok("Password reset instructions sent successfully");
     }
 
     @PostMapping("/reset-password")
@@ -66,9 +64,7 @@ public class AuthController {
 
         authService.resetPassword(request);
 
-        return ResponseEntity.ok(
-                "Password reset successfully"
-        );
+        return ResponseEntity.ok("Password reset successfully");
     }
 
     @PostMapping("/change-password")
@@ -77,8 +73,6 @@ public class AuthController {
 
         authService.changePassword(request,authentication);
 
-        return ResponseEntity.ok(
-                "Password changed successfully"
-        );
+        return ResponseEntity.ok("Password changed successfully");
     }
 }
