@@ -29,14 +29,8 @@ public class Image {
     @Column(name = "storage_public_id", length = 255)
     private String storagePublicId;
 
-    @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted;
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
