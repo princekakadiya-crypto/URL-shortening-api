@@ -46,8 +46,8 @@ public class ShortUrl {
     @Column(name = "last_accessed_at")
     private LocalDateTime lastAccessedAt;
 
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "shortUrl")
     private List<Purchase> purchases = new ArrayList<>();
