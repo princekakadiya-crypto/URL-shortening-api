@@ -6,7 +6,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.awt.*;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +17,7 @@ public class SystemConfigCache {
 
     private final SystemConfigRepository repository;
 
-    private Map<String, String> configs;
+    private Map<String, String> configs=new ConcurrentHashMap<>();
 
     @PostConstruct
     public void loadConfigs() {
@@ -32,6 +33,10 @@ public class SystemConfigCache {
 
     public Integer getInt(String key) {
         return Integer.parseInt(configs.get(key));
+    }
+
+    public void update(String key, String value) {
+        configs.put(key, value);
     }
 
 }

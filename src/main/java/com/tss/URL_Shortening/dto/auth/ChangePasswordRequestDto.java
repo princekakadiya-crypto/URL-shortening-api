@@ -1,5 +1,7 @@
 package com.tss.URL_Shortening.dto.auth;
 
+import com.tss.URL_Shortening.cache.SystemConfigCache;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -15,6 +17,6 @@ public class ChangePasswordRequestDto {
     private String oldPassword;
 
     @NotBlank(message = "New password is required")
-    @Size(min = 8, max = 100, message = "New password must be between 8 and 100 characters")
+    @Max(value = 100, message = "New password must be less then or equals 100 characters")
     private String newPassword;
 }

@@ -1,5 +1,6 @@
 package com.tss.URL_Shortening.service;
 
+import com.tss.URL_Shortening.cache.SystemConfigCache;
 import com.tss.URL_Shortening.dto.auth.*;
 import com.tss.URL_Shortening.dto.user.UserResponseDto;
 import com.tss.URL_Shortening.entity.OtpVerification;
@@ -42,10 +43,17 @@ public class AuthServiceImpl implements AuthService {
     private final OtpVerificationRepository otpVerificationRepository;
     private final EmailService emailService;
     private final TokenBlacklistRepository tokenBlacklistRepository;
+    private final SystemConfigCache configCache;
 
     @Override
     @Transactional
     public UserResponseDto register(RegisterRequestDto requestDto) {
+
+        int minPasswordLength = configCache.getInt("MIN_PASSWORD_LENGTH");
+
+        if (requestDto.getPassword().length() < minPasswordLength) {
+            throw new InvalidOperationException("New password must be at least " + minPasswordLength + " characters");
+        }
 
         if (userRepository.existsByEmail(requestDto.getEmail()))
             throw new DuplicateResourceException("Email is already Exists");
@@ -68,7 +76,6 @@ public class AuthServiceImpl implements AuthService {
 
         User savedUser=userRepository.save(user);
 
-
         String otp = generateOtp();
         OtpVerification otpVerification = new OtpVerification();
 
@@ -76,9 +83,11 @@ public class AuthServiceImpl implements AuthService {
         otpVerification.setOtpHash(otp);
         otpVerification.setPurpose(OtpPurpose.PASSWORD_RESET);
         otpVerification.setAttempts(0);
-        otpVerification.setMaxAttempts(3);
+        otpVerification.setMaxAttempts(configCache.getInt("OTP_MAX_ATTEMPTS"));
         otpVerification.setCreatedAt(LocalDateTime.now());
-        otpVerification.setExpiresAt(LocalDateTime.now().plusMinutes(10));
+        otpVerification.setExpiresAt(LocalDateTime.now().plusMinutes(
+                configCache.getInt("OTP_EXPIRY_MINUTES")
+        ));
 
         otpVerificationRepository.save(otpVerification);
 
@@ -191,9 +200,9 @@ public class AuthServiceImpl implements AuthService {
         otpVerification.setOtpHash(otp);
         otpVerification.setPurpose(OtpPurpose.PASSWORD_RESET);
         otpVerification.setAttempts(0);
-        otpVerification.setMaxAttempts(3);
+        otpVerification.setMaxAttempts(configCache.getInt("OTP_MAX_ATTEMPTS"));
         otpVerification.setCreatedAt(LocalDateTime.now());
-        otpVerification.setExpiresAt(LocalDateTime.now().plusMinutes(10));
+        otpVerification.setExpiresAt(LocalDateTime.now().plusMinutes(configCache.getInt("OTP_EXPIRY_MINUTES")));
 
         otpVerificationRepository.save(otpVerification);
 
@@ -203,6 +212,12 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void resetPassword(ResetPasswordRequestDto requestDto) {
+
+        int minPasswordLength = configCache.getInt("MIN_PASSWORD_LENGTH");
+
+        if (requestDto.getNewPassword().length() < minPasswordLength) {
+            throw new InvalidOperationException("New password must be at least " + minPasswordLength + " characters");
+        }
 
         User user = userRepository.findByEmail(requestDto.getEmail())
                 .orElseThrow(() -> new InvalidCredentialException("Invalid email"));
@@ -222,6 +237,12 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void changePassword(ChangePasswordRequestDto request,Authentication authentication) {
+
+        int minPasswordLength = configCache.getInt("MIN_PASSWORD_LENGTH");
+
+        if (request.getNewPassword().length() < minPasswordLength) {
+            throw new InvalidOperationException("New password must be at least " + minPasswordLength + " characters");
+        }
 
         String userName = authentication.getName();
 

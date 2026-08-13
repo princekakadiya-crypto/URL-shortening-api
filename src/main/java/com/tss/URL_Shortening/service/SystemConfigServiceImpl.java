@@ -1,5 +1,6 @@
 package com.tss.URL_Shortening.service;
 
+import com.tss.URL_Shortening.cache.SystemConfigCache;
 import com.tss.URL_Shortening.dto.PageDto;
 import com.tss.URL_Shortening.dto.config.SystemConfigResponseDto;
 import com.tss.URL_Shortening.dto.config.UpdateSystemConfigRequestDto;
@@ -27,6 +28,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
     private final SystemConfigRepository systemConfigRepository;
     private final UserRepository userRepository;
     private final SystemConfigMapper systemConfigMapper;
+    private final SystemConfigCache configCache;
 
     @Override
     public PageDto<SystemConfigResponseDto> getAllConfigurations(Pageable pageable) {
@@ -84,6 +86,8 @@ public class SystemConfigServiceImpl implements SystemConfigService {
         config.setUpdatedBy(admin);
 
         SystemConfig savedConfig = systemConfigRepository.save(config);
+
+        configCache.update(savedConfig.getConfigKey(), savedConfig.getConfigValue());
 
         return systemConfigMapper.toDto(savedConfig);
     }

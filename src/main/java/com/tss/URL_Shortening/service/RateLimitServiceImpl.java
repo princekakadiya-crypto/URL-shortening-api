@@ -1,6 +1,8 @@
 package com.tss.URL_Shortening.service;
 
+import com.tss.URL_Shortening.cache.RateLimitConfigCache;
 import com.tss.URL_Shortening.dto.PageDto;
+import com.tss.URL_Shortening.dto.ratelimit.RateLimitConfigDto;
 import com.tss.URL_Shortening.dto.ratelimit.RateLimitConfigResponseDto;
 import com.tss.URL_Shortening.dto.ratelimit.UpdateRateLimitConfigRequestDto;
 import com.tss.URL_Shortening.entity.RateLimitConfig;
@@ -25,6 +27,7 @@ public class RateLimitServiceImpl implements RateLimitService{
     private final RateLimitConfigRepository rateLimitConfigRepository;
     private final RateLimitConfigMapper rateLimitConfigMapper;
     private final UserRepository userRepository;
+    private final RateLimitConfigCache rateLimitConfigCache;
 
     @Override
     public PageDto<RateLimitConfigResponseDto> getAllRateLimits(Pageable pageable) {
@@ -70,6 +73,13 @@ public class RateLimitServiceImpl implements RateLimitService{
         config.setUpdatedBy(admin);
 
         RateLimitConfig savedConfig = rateLimitConfigRepository.save(config);
+
+        RateLimitConfigDto dto=new RateLimitConfigDto(
+                savedConfig.getMaxRequests(),
+                savedConfig.getWindowSeconds(),
+                savedConfig.getIsActive()
+        );
+        rateLimitConfigCache.update(savedConfig.getEndpointKey(), dto);
 
         return rateLimitConfigMapper.toDto(savedConfig);
     }
