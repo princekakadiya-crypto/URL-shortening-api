@@ -60,6 +60,7 @@ public class JwtTokenProvider {
         Claims claims =Jwts.parser().verifyWith(key()).build().parseSignedClaims(token).getPayload();
         return claims.getSubject();
     }
+
     public LocalDateTime getExpirationDateFromToken(String token) {
 
         Claims claims = Jwts.parser().verifyWith(key()).build().parseSignedClaims(token).getPayload();

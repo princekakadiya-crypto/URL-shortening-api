@@ -30,6 +30,10 @@ public class RateLimitConfig {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "updated_by")
+    private User updatedBy;
+
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 }

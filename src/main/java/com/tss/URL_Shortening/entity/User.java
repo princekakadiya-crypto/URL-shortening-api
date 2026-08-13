@@ -69,6 +69,11 @@ public class User {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "updatedBy")
     private List<SystemConfig> systemConfigs = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "updatedBy")
+    private List<RateLimitConfig> rateLimitConfigs = new ArrayList<>();
+
+
+
     @PrePersist
     protected void onCreate() {
 
