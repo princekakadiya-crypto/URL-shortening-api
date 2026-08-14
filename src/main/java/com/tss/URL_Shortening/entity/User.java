@@ -48,14 +48,7 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<ShortUrl> shortUrls = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<Purchase> purchases = new ArrayList<>();
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<Payment> payments = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<OtpVerification> otpVerifications = new ArrayList<>();
@@ -90,6 +83,9 @@ public class User {
             isActive = true;
         }
     }
+
+    @Column(nullable = false)
+    private Integer linkSlots = 3;
 
     @PreUpdate
     protected void onUpdate() {
