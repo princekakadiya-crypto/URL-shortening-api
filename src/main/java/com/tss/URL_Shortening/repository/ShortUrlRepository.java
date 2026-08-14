@@ -11,8 +11,10 @@ import java.util.Optional;
 
 @Repository
 public interface ShortUrlRepository extends JpaRepository<ShortUrl, Long> {
-    Page<ShortUrl> findAllByIsDeletedFalse(Pageable pageable);
+    Optional<ShortUrl> findByShortCode(String shortCode);
 
-    Optional<ShortUrl> findByShortUrlIdAndIsDeletedFalse(Long shortUrlId);
+    boolean existsByShortCode(String shortCode);
+
+
 
 }
