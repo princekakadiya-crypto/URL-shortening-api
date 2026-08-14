@@ -1,4 +1,16 @@
 package com.tss.URL_Shortening.service;
 
-public class QrCodeService {
+import com.tss.URL_Shortening.entity.ShortUrl;
+
+public interface QrCodeService {
+
+
+
+
+
+
+        String generateQrCode(ShortUrl url);
+
+
+
 }

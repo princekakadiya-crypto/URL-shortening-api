@@ -54,4 +54,32 @@ public class CloudinaryService {
             );
         }
     }
+
+
+
+
+    public String uploadQrCode(byte[] qrImage, String publicId) {
+
+        try {
+
+            Map<?, ?> result = cloudinary.uploader().upload(
+                    qrImage,
+                    ObjectUtils.asMap(
+                            "public_id", publicId,
+                            "resource_type", "image",
+                            "folder", "url-shortener/qr-codes"
+                    )
+            );
+
+            return result.get("secure_url").toString();
+
+        } catch (Exception e) {
+
+            throw new RuntimeException(
+                    "Failed to upload QR code to Cloudinary",
+                    e
+            );
+        }
+    }
+
 }
