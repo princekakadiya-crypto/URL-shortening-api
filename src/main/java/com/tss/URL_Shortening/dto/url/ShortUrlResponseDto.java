@@ -1,37 +1,23 @@
 package com.tss.URL_Shortening.dto.url;
 
 import com.tss.URL_Shortening.enums.UrlStatus;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.boot.convert.DataSizeUnit;
 
 import java.time.LocalDateTime;
 
-@NoArgsConstructor
+@Getter
+@Setter
 @AllArgsConstructor
-@Data
 public class ShortUrlResponseDto {
 
-    private Long shortUrlId;
+    
 
-    private String longUrl;
+        private Long id;
 
-    private String alias;
+        private String originalUrl;
 
-    private Integer totalVisits;
+        private String shortUrl;
 
-    private Integer remainingVisits;
 
-    private UrlStatus status;
-
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
-
-    private LocalDateTime lastAccessedAt;
-
-    private Boolean isDeleted;
-
-    private Long userId;
 }
