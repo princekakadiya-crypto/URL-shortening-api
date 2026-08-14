@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Entity
 @Table(name = "short_urls")
 @Getter
@@ -16,46 +17,33 @@ import java.util.List;
 @AllArgsConstructor
 public class ShortUrl {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "short_url_id")
-    private Long shortUrlId;
 
-    @Column(name = "long_url", nullable = false, columnDefinition = "TEXT")
-    private String longUrl;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
 
-    @Column(name = "alias", nullable = false, unique = true, length = 100)
-    private String alias;
+        @Column(nullable = false, columnDefinition = "TEXT")
+        private String originalUrl;
 
-    @Column(name = "total_visits", nullable = false)
-    private Integer totalVisits;
+        @Column(nullable = false, unique = true, length = 20)
+        private String shortCode;
 
-    @Column(name = "remaining_visits", nullable = false)
-    private Integer remainingVisits;
+        @ManyToOne
+        @JoinColumn(name = "user_id", nullable = false)
+        private User user;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
-    private UrlStatus status;
+        @Column
+        private Integer visitsLimit=100;
+        @Column
+        private Integer visitsCount;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+        @Enumerated(EnumType.STRING)
+        private UrlStatus status;
 
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+        @Column(nullable = true)
+        private String qrLink;
 
-    @Column(name = "last_accessed_at")
-    private LocalDateTime lastAccessedAt;
 
-    @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "shortUrl")
-    private List<Purchase> purchases = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "shortUrl")
-    private List<Image> images = new ArrayList<>();
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
 }

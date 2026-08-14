@@ -13,31 +13,34 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Payment {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "payment_id")
-    private Long paymentId;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
 
-    @Column(name = "amount", nullable = false, precision = 10, scale = 2)
-    private BigDecimal amount;
+        @ManyToOne
+        @JoinColumn(name = "user_id", nullable = false)
+        private User user;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "payment_status", nullable = false, length = 20)
-    private PaymentStatus paymentStatus;
+        @OneToOne
+        @JoinColumn(name = "purchase_id", nullable = false)
+        private Purchase purchase;
 
-    @Column(name = "payment_reference", unique = true, length = 100)
-    private String paymentReference;
+        private String paymentGateway;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+        private String gatewayPaymentId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "purchase_id", nullable = false, unique = true)
-    private Purchase purchase;
+        private BigDecimal amount;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+        private String currency;
+
+        @Enumerated(EnumType.STRING)
+        private PaymentStatus status;
+
+        private LocalDateTime paidAt;
+
+        private LocalDateTime createdAt;
+
 }

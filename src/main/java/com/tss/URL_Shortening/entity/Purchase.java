@@ -14,41 +14,36 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Purchase {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "purchase_id")
-    private Long purchaseId;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "purchase_type", nullable = false, length = 30)
-    private PurchaseType purchaseType;
 
-    @Column(name = "quantity", nullable = false)
-    private Integer quantity;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
 
-    @Column(name = "unit_price", nullable = false, precision = 10, scale = 2)
-    private BigDecimal unitPrice;
+        @ManyToOne
+        @JoinColumn(name = "user_id", nullable = false)
+        private User user;
 
-    @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)
-    private BigDecimal totalAmount;
+        @ManyToOne
+        @JoinColumn(name = "business_offer_id", nullable = false)
+        private BusinessOffer businessOffer;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
-    private PurchaseStatus status;
+        @ManyToOne
+        @JoinColumn(name = "url_id")
+        private ShortUrl url;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+        private Integer quantity;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "purchase")
-    private Payment payment;
+        private BigDecimal totalAmount;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+        private String transactionId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "short_url_id")
-    private ShortUrl shortUrl;
+        private LocalDateTime createdAt;
+
+
+
+
 }
