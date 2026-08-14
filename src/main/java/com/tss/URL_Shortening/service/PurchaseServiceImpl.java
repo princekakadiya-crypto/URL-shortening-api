@@ -1,5 +1,6 @@
 package com.tss.URL_Shortening.service;
 
+import com.tss.URL_Shortening.dto.purchase.CreatePurchaseRequestDto;
 import com.tss.URL_Shortening.dto.purchase.PurchaseResponseDto;
 import com.tss.URL_Shortening.entity.BusinessOffer;
 import com.tss.URL_Shortening.entity.Purchase;
@@ -39,7 +40,7 @@ public class PurchaseServiceImpl implements PurchaseService{
         @Override
         @Transactional
         public PurchaseResponseDto createPurchase(
-                PurchaseRequestDto request) {
+                CreatePurchaseRequestDto request) {
 
             // -----------------------------------------------------
             // 1. Find User

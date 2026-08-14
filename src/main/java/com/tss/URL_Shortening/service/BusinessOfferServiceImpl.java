@@ -1,5 +1,7 @@
 package com.tss.URL_Shortening.service;
 
+import com.tss.URL_Shortening.dto.businessoffer.BusinessOfferRequestDto;
+import com.tss.URL_Shortening.dto.businessoffer.BusinessOfferResponseDto;
 import com.tss.URL_Shortening.entity.BusinessOffer;
 import com.tss.URL_Shortening.repository.BusinessOfferRepository;
 import lombok.RequiredArgsConstructor;

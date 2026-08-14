@@ -1,5 +1,6 @@
 package com.tss.URL_Shortening.service;
 
+import com.tss.URL_Shortening.dto.url.CreateShortUrlRequestDto;
 import com.tss.URL_Shortening.dto.url.ShortUrlResponseDto;
 import com.tss.URL_Shortening.entity.ShortUrl;
 import com.tss.URL_Shortening.entity.User;
@@ -15,8 +16,6 @@ import java.util.UUID;
 @Service
 @AllArgsConstructor
 public class ShortUrlServiceImpl implements ShortUrlService{
-
-
 
 
         private final ShortUrlRepository shortUrlRepository;
@@ -51,7 +50,7 @@ public class ShortUrlServiceImpl implements ShortUrlService{
         @Override
         @Transactional
         public ShortUrlResponseDto shortenUrl(
-                ShortUrlRequestDto request) {
+                CreateShortUrlRequestDto request) {
 
 
             // -----------------------------------------------------
