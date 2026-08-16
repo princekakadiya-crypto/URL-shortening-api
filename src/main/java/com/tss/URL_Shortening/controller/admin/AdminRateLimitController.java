@@ -4,7 +4,7 @@ package com.tss.URL_Shortening.controller.admin;
 import com.tss.URL_Shortening.dto.PageDto;
 import com.tss.URL_Shortening.dto.ratelimit.RateLimitConfigResponseDto;
 import com.tss.URL_Shortening.dto.ratelimit.UpdateRateLimitConfigRequestDto;
-import com.tss.URL_Shortening.service.RateLimitService;
+import com.tss.URL_Shortening.service.RateLimitConfigService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class AdminRateLimitController {
 
-    private final RateLimitService rateLimitService;
+    private final RateLimitConfigService rateLimitService;
 
     @GetMapping
     public ResponseEntity<PageDto<RateLimitConfigResponseDto>> getAllRateLimits(Pageable pageable) {

@@ -40,10 +40,10 @@ public class ShortUrl {
         @Enumerated(EnumType.STRING)
         private UrlStatus status;
 
+        @Column(name = "is_deleted")
+        private boolean deleted;
+
         @Column(nullable = true)
         private String qrLink;
-
-
-
 
 }
