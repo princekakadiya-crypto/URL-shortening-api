@@ -5,6 +5,7 @@ import com.tss.URL_Shortening.security.JwtAuthenticationFilter;
 import com.tss.URL_Shortening.security.RateLimitFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -57,6 +58,10 @@ public class SecurityConfig {
                         "/api/v1/auth/forgot-password",
                         "/api/v1/auth/reset-password"
                 ).permitAll()
+                .requestMatchers(HttpMethod.GET, "/{alias}")
+                .permitAll()
+                .requestMatchers("/api/v1/admin/**")
+                .hasRole("ADMIN")
                 .requestMatchers("/api/**").authenticated().anyRequest().authenticated());
 
         http.exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint));
