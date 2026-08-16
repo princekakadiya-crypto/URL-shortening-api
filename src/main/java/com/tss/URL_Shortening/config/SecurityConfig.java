@@ -2,6 +2,7 @@ package com.tss.URL_Shortening.config;
 
 import com.tss.URL_Shortening.security.JwtAuthenticationEntryPoint;
 import com.tss.URL_Shortening.security.JwtAuthenticationFilter;
+import com.tss.URL_Shortening.security.RateLimitFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,12 +24,14 @@ public class SecurityConfig {
     private UserDetailsService userDetailsService;
     private JwtAuthenticationFilter authenticationFilter;
     private JwtAuthenticationEntryPoint authenticationEntryPoint;
+    private RateLimitFilter rateLimitFilter;
 
-    public SecurityConfig(UserDetailsService userDetailsService, JwtAuthenticationFilter authenticationFilter, JwtAuthenticationEntryPoint authenticationEntryPoint) {
+    public SecurityConfig(UserDetailsService userDetailsService, JwtAuthenticationFilter authenticationFilter, JwtAuthenticationEntryPoint authenticationEntryPoint,RateLimitFilter rateLimitFilter) {
         super();
         this.userDetailsService = userDetailsService;
         this.authenticationFilter = authenticationFilter;
         this.authenticationEntryPoint = authenticationEntryPoint;
+        this.rateLimitFilter=rateLimitFilter;
     }
 
     @Bean
@@ -59,6 +62,8 @@ public class SecurityConfig {
         http.exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint));
 
         http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        http.addFilterAfter(rateLimitFilter, JwtAuthenticationFilter.class);
 
         //http.authorizeHttpRequests(request -> request.anyRequest().authenticated());
         return http.build();

@@ -27,7 +27,7 @@ public class AdminUrlServiceImpl implements AdminUrlService{
     @Override
     public PageDto<ShortUrlResponseDto> getAllUrls(Pageable pageable) {
 
-        Page<ShortUrl> shortUrls=shortUrlRepository.findAllByIsDeletedFalse(pageable);
+        Page<ShortUrl> shortUrls=shortUrlRepository.findAllByDeletedFalse(pageable);
 
         List<ShortUrlResponseDto> responseDtos=new ArrayList<>();
 
@@ -67,11 +67,11 @@ public class AdminUrlServiceImpl implements AdminUrlService{
         ShortUrl shortUrl = shortUrlRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("URL not found"));
 
-        if (Boolean.TRUE.equals(shortUrl.getIsDeleted())) {
+        if (shortUrl.isDeleted()) {
             throw new InvalidOperationException("URL is already deleted");
         }
 
-        shortUrl.setIsDeleted(true);
+        shortUrl.setDeleted(true);
         shortUrlRepository.save(shortUrl);
     }
 
@@ -82,11 +82,11 @@ public class AdminUrlServiceImpl implements AdminUrlService{
         ShortUrl shortUrl = shortUrlRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("URL not found"));
 
-        if (!Boolean.TRUE.equals(shortUrl.getIsDeleted())) {
+        if (!shortUrl.isDeleted()) {
             throw new InvalidOperationException("URL is not deleted");
         }
 
-        shortUrl.setIsDeleted(false);
+        shortUrl.setDeleted(false);
 
         ShortUrl savedUrl = shortUrlRepository.save(shortUrl);
         return shortUrlMapper.toDto(savedUrl);
