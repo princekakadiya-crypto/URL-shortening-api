@@ -44,6 +44,10 @@ public class ShortUrl {
         private String qrLink;
 
 
+        @Column
+        private Boolean deleted = false;
+
+
 
 
 }
