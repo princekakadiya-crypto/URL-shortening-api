@@ -118,7 +118,7 @@ public class ShortUrlServiceImpl implements ShortUrlService{
             // -----------------------------------------------------
 
             String shortUrlString =
-                    "http://localhost:8080/"
+                    "http://localhost:8080/api/urls/"
                             + savedUrl.getShortCode();
 
 

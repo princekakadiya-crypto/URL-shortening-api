@@ -34,20 +34,21 @@ public class ShortUrl {
 
         @Column
         private Integer visitsLimit=100;
+
         @Column
         private Integer visitsCount;
 
         @Enumerated(EnumType.STRING)
         private UrlStatus status;
 
+        @Column(name = "is_deleted")
+        private boolean deleted;
+
         @Column(nullable = true)
         private String qrLink;
 
-
         @Column
         private Boolean deleted = false;
-
-
 
 
 }

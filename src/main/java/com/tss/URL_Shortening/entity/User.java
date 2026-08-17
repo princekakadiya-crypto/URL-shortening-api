@@ -49,21 +49,23 @@ public class User {
     private Role role;
 
 
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<OtpVerification> otpVerifications = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<TokenBlacklist> tokenBlacklists = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<Image> images = new ArrayList<>();
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Image image;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "updatedBy")
     private List<SystemConfig> systemConfigs = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "updatedBy")
     private List<RateLimitConfig> rateLimitConfigs = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    private List<ShortUrl> shortUrls=new ArrayList<>();
 
 
 
@@ -84,7 +86,7 @@ public class User {
         }
     }
 
-    @Column(nullable = false)
+    @Column
     private Integer linkSlots = 3;
 
     @PreUpdate
