@@ -11,13 +11,6 @@ import java.util.List;
 public interface AdminUrlService {
 
 
-    Page<User> getAllUsers(Pageable pageable);
-
-    User getUserByUserId(Long id);
-
-    void deleteUserById(Long id);
-
-
     Page<ShortUrlResponseDto> getAllShortUrls(Pageable pageable);
 
     ShortUrlResponseDto getShortUrlById(Long id);

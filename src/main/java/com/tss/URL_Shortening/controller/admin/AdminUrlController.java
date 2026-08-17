@@ -55,7 +55,7 @@ public class AdminUrlController {
         }
 
 
- 
+
         @PatchMapping("/{shortUrlId}/restore")
         public ResponseEntity<ShortUrlResponseDto> reactivateShortUrl(
                 @PathVariable Long shortUrlId) {

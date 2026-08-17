@@ -26,39 +26,12 @@ import java.util.List;
 public class AdminUrlServiceImpl implements AdminUrlService{
 
 
-        private final UserRepository userRepository;
         private final ShortUrlRepository shortUrlRepository;
 
         // =========================================================
         // USER MANAGEMENT
         // =========================================================
 
-        @Override
-        public Page<User> getAllUsers(Pageable pageable) {
-
-            return userRepository.findAll(pageable);
-        }
-
-
-        @Override
-        public User getUserByUserId(Long id) {
-
-            return userRepository.findById(id)
-                    .orElseThrow(() ->
-                            new RuntimeException("User not found"));
-        }
-
-
-        @Override
-        @Transactional
-        public void deleteUserById(Long id) {
-
-            User user = userRepository.findById(id)
-                    .orElseThrow(() ->
-                            new RuntimeException("User not found"));
-
-            userRepository.delete(user);
-        }
 
 
         // =========================================================
