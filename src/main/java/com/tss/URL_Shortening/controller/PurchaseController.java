@@ -3,15 +3,19 @@ package com.tss.URL_Shortening.controller;
 import com.tss.URL_Shortening.dto.purchase.CreatePurchaseRequestDto;
 import com.tss.URL_Shortening.dto.purchase.PurchaseResponseDto;
 import com.tss.URL_Shortening.entity.ShortUrl;
+import com.tss.URL_Shortening.entity.User;
 import com.tss.URL_Shortening.service.PurchaseService;
 import com.tss.URL_Shortening.service.QrCodeService;
 import com.tss.URL_Shortening.service.ShortUrlService;
+import com.tss.URL_Shortening.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -23,6 +27,7 @@ public class PurchaseController {
         private final PurchaseService purchaseService;
         private final ShortUrlService shortUrlService;
         private  final QrCodeService qrCodeService;
+        private  final UserService userService;
 
         @PostMapping
         public ResponseEntity<PurchaseResponseDto> createPurchase(
@@ -41,9 +46,15 @@ public class PurchaseController {
                     purchaseService.getPurchase(id));
         }
 
-        @GetMapping("/user/{userId}")
+        @GetMapping("/user/My-Purchases")
         public ResponseEntity<List<PurchaseResponseDto>> getUserPurchases(
-                @PathVariable Long userId) {
+                                             Authentication authentication) {
+            String username = authentication.getName();
+            Optional<User> user = userService.findByName(username);
+            Long userId = user.get().getUserId();
+
+
+
 
             return ResponseEntity.ok(
                     purchaseService.getPurchasesByUser(userId));
