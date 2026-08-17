@@ -26,93 +26,75 @@ import java.util.List;
 public class AdminUrlServiceImpl implements AdminUrlService{
 
 
+        private final ShortUrlMapper shortUrlMapper;
         private final ShortUrlRepository shortUrlRepository;
 
-        // =========================================================
-        // USER MANAGEMENT
-        // =========================================================
-
-
-
-        // =========================================================
-        // SHORT URL MANAGEMENT
-        // =========================================================
-
         @Override
-        public Page<ShortUrlResponseDto> getAllShortUrls(Pageable pageable) {
+        public PageDto<ShortUrlResponseDto> getAllUrls(Pageable pageable) {
 
-            Page<ShortUrl> urls =
-                    shortUrlRepository.findAll(pageable);
+            Page<ShortUrl> shortUrls=shortUrlRepository.findAllByDeletedFalse(pageable);
 
-            return urls.map(url -> {
+            List<ShortUrlResponseDto> responseDtos=new ArrayList<>();
 
-                String shortUrl =
-                        "http://localhost:8080/"
-                                + url.getShortCode();
+            for (ShortUrl shortUrl:shortUrls){
+                ShortUrlResponseDto dto= shortUrlMapper.toDto(shortUrl);
+                responseDtos.add(dto);
+            }
 
-                return new ShortUrlResponseDto(
-                        url.getId(),
-                        url.getOriginalUrl(),
-                        shortUrl
-                );
-            });
+            PageDto<ShortUrlResponseDto> pageDto = new PageDto<>();
+
+            pageDto.setContent(responseDtos);
+            pageDto.setCurrentPage(shortUrls.getNumber());
+            pageDto.setPageSize(shortUrls.getSize());
+            pageDto.setTotalPages(shortUrls.getTotalPages());
+            pageDto.setTotalElements(shortUrls.getTotalElements());
+            pageDto.setFirst(shortUrls.isFirst());
+            pageDto.setLast(shortUrls.isLast());
+            pageDto.setEmpty(shortUrls.isEmpty());
+
+            return pageDto;
         }
-
-
-        @Override
-        public ShortUrlResponseDto getShortUrlById(Long id) {
-
-            ShortUrl url = shortUrlRepository.findById(id)
-                    .orElseThrow(() ->
-                            new RuntimeException("URL not found"));
-
-            String shortUrl =
-                    "http://localhost:8080/"
-                            + url.getShortCode();
-
-            return new ShortUrlResponseDto(
-                    url.getId(),
-                    url.getOriginalUrl(),
-                    shortUrl
-            );
-        }
-
 
         @Override
         @Transactional
-        public void deleteShortUrl(Long id) {
+        public ShortUrlResponseDto getUrlById(Long id) {
 
-            ShortUrl url = shortUrlRepository.findById(id)
-                    .orElseThrow(() ->
-                            new RuntimeException("URL not found"));
+            ShortUrl shortUrl = shortUrlRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("URL not found"));
 
-            url.setStatus(UrlStatus.EXPIRED);
-
-            shortUrlRepository.save(url);
+            return shortUrlMapper.toDto(shortUrl);
         }
-
 
         @Override
         @Transactional
-        public ShortUrlResponseDto restoreShortUrl(Long id) {
+        public void deleteUrl(Long id) {
 
-            ShortUrl url = shortUrlRepository.findById(id)
-                    .orElseThrow(() ->
-                            new RuntimeException("URL not found"));
+            ShortUrl shortUrl = shortUrlRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("URL not found"));
 
-            url.setStatus(UrlStatus.ACTIVE);
+            if (shortUrl.isDeleted()) {
+                throw new InvalidOperationException("URL is already deleted");
+            }
 
-            shortUrlRepository.save(url);
+            shortUrl.setDeleted(true);
+            shortUrlRepository.save(shortUrl);
+        }
 
-            String shortUrl =
-                    "http://localhost:8080/"
-                            + url.getShortCode();
+        @Override
+        @Transactional
+        public ShortUrlResponseDto restoreUrl(Long id) {
 
-            return new ShortUrlResponseDto(
-                    url.getId(),
-                    url.getOriginalUrl(),
-                    shortUrl
-            );
+            ShortUrl shortUrl = shortUrlRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("URL not found"));
+
+            if (!shortUrl.isDeleted()) {
+                throw new InvalidOperationException("URL is not deleted");
+            }
+
+            shortUrl.setDeleted(false);
+
+            ShortUrl savedUrl = shortUrlRepository.save(shortUrl);
+            return shortUrlMapper.toDto(savedUrl);
         }
 
 

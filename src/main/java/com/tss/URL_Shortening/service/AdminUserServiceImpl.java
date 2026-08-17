@@ -14,9 +14,8 @@ public class AdminUserServiceImpl implements  AdminUserService {
 
 
      private  final  UserRepository userRepository;
-    // =========================================================
-    // USER MANAGEMENT
-    // =========================================================
+
+
 
     @Override
     public Page<User> getAllUsers(Pageable pageable) {
