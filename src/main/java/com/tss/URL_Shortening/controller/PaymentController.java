@@ -19,10 +19,10 @@ public class PaymentController {
 
         @PostMapping
         public ResponseEntity<PaymentResponseDto> createPayment(
-                @RequestBody PaymentRequestDto request) {
+                @RequestBody PaymentRequestDto requestDto) {
 
             return ResponseEntity.ok(
-                    paymentService.createPayment(request));
+                    paymentService.createPayment(requestDto));
         }
 
         @PutMapping("/{paymentId}/success")

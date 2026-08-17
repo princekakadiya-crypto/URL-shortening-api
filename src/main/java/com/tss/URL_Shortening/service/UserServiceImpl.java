@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -25,6 +26,13 @@ public class UserServiceImpl implements UserService{
     private final UserMapper userMapper;
     private final CloudinaryService cloudinaryService;
     private final ImageRepository imageRepository;
+
+
+
+    @Override
+    public Optional<User> findByName(String name) {
+        return userRepository.findByUserName(name);
+    }
 
     @Override
     @Transactional

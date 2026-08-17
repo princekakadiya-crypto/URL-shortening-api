@@ -4,7 +4,9 @@ import com.tss.URL_Shortening.dto.PageDto;
 import com.tss.URL_Shortening.dto.url.ShortUrlResponseDto;
 import com.tss.URL_Shortening.service.AdminUrlService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,30 +17,32 @@ import java.util.List;
 @AllArgsConstructor
 public class AdminUrlController {
 
-    private final AdminUrlService adminUrlService;
 
-    @GetMapping
-    public ResponseEntity<PageDto<ShortUrlResponseDto>> getAllUrls(Pageable pageable) {
+        private final AdminUrlService adminUrlService;
 
-        return ResponseEntity.ok(adminUrlService.getAllUrls(pageable));
-    }
+        @GetMapping
+        public ResponseEntity<PageDto<ShortUrlResponseDto>> getAllUrls(Pageable pageable) {
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ShortUrlResponseDto> getUrlById(@PathVariable Long id) {
+            return ResponseEntity.ok(adminUrlService.getAllUrls(pageable));
+        }
 
-        return ResponseEntity.ok(adminUrlService.getUrlById(id));
-    }
+        @GetMapping("/{id}")
+        public ResponseEntity<ShortUrlResponseDto> getUrlById(@PathVariable Long id) {
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUrl(@PathVariable Long id) {
+            return ResponseEntity.ok(adminUrlService.getUrlById(id));
+        }
 
-        adminUrlService.deleteUrl(id);
-        return ResponseEntity.noContent().build();
-    }
+        @DeleteMapping("/{id}")
+        public ResponseEntity<Void> deleteUrl(@PathVariable Long id) {
 
-    @PatchMapping("/{id}/restore")
-    public ResponseEntity<ShortUrlResponseDto> restoreUrl(@PathVariable Long id) {
+            adminUrlService.deleteUrl(id);
+            return ResponseEntity.noContent().build();
+        }
 
-        return ResponseEntity.ok(adminUrlService.restoreUrl(id));
-    }
+        @PatchMapping("/{id}/restore")
+        public ResponseEntity<ShortUrlResponseDto> restoreUrl(@PathVariable Long id) {
+
+            return ResponseEntity.ok(adminUrlService.restoreUrl(id));
+        }
+
 }
