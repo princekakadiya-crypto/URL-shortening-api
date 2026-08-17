@@ -34,6 +34,7 @@ public class ShortUrl {
 
         @Column
         private Integer visitsLimit=100;
+
         @Column
         private Integer visitsCount;
 
