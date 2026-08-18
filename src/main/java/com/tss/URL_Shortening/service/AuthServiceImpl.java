@@ -76,11 +76,12 @@ public class AuthServiceImpl implements AuthService {
         User savedUser=userRepository.save(user);
 
         String otp = generateOtp();
+        String otpHash = passwordEncoder.encode(otp);
         OtpVerification otpVerification = new OtpVerification();
 
         otpVerification.setUser(user);
-        otpVerification.setOtpHash(otp);
-        otpVerification.setPurpose(OtpPurpose.PASSWORD_RESET);
+        otpVerification.setOtpHash(otpHash);
+        otpVerification.setPurpose(OtpPurpose.EMAIL_VERIFICATION);
         otpVerification.setAttempts(0);
         otpVerification.setMaxAttempts(configCache.getInt("OTP_MAX_ATTEMPTS"));
         otpVerification.setCreatedAt(LocalDateTime.now());
@@ -123,14 +124,24 @@ public class AuthServiceImpl implements AuthService {
             throw new InvalidOperationException("Email is already verified");
         }
 
-        OtpVerification otpVerification = otpVerificationRepository.findValidLatestOtp(
-                user.getUserId(),OtpPurpose.EMAIL_VERIFICATION.name())
-                .orElseThrow(() -> new InvalidCredentialException("Invalid Otp"));
+        OtpVerification otpVerification = otpVerificationRepository.findValidLatestOtp(user.getUserId(), OtpPurpose.EMAIL_VERIFICATION.name())
+                .orElseThrow(() -> new InvalidCredentialException("Invalid or expired OTP"));
 
+        if (otpVerification.getAttempts() >= otpVerification.getMaxAttempts()) {
+            throw new InvalidCredentialException("Maximum OTP attempts exceeded");
+        }
+
+        boolean otpMatches = passwordEncoder.matches(requestDto.getOtp(), otpVerification.getOtpHash());
+        if (!otpMatches) {
+            otpVerification.setAttempts(otpVerification.getAttempts() + 1);
+            otpVerificationRepository.save(otpVerification);
+            throw new InvalidCredentialException("Invalid OTP");
+        }
+
+        otpVerification.setVerifiedAt(LocalDateTime.now());
         user.setEmailVerified(true);
-
-        userRepository.save(user);
         otpVerificationRepository.save(otpVerification);
+        userRepository.save(user);
     }
 
     @Override
@@ -171,11 +182,12 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String otp = generateOtp();
+        String otpHash = passwordEncoder.encode(otp);
 
         OtpVerification otpVerification = new OtpVerification();
 
         otpVerification.setUser(user);
-        otpVerification.setOtpHash(otp);
+        otpVerification.setOtpHash(otpHash);
         otpVerification.setPurpose(OtpPurpose.PASSWORD_RESET);
         otpVerification.setAttempts(0);
         otpVerification.setMaxAttempts(configCache.getInt("OTP_MAX_ATTEMPTS"));
@@ -200,15 +212,24 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(requestDto.getEmail())
                 .orElseThrow(() -> new InvalidCredentialException("Invalid email"));
 
-        OtpVerification otpVerification = otpVerificationRepository
-                .findValidLatestOtp(user.getUserId(), OtpPurpose.PASSWORD_RESET.name())
-                .orElseThrow(() -> new InvalidOtpException("Invalid Otp"));
+        OtpVerification otpVerification = otpVerificationRepository.findValidLatestOtp(user.getUserId(), OtpPurpose.PASSWORD_RESET.name())
+                .orElseThrow(() -> new InvalidOtpException("Invalid or expired OTP"));
 
-        // Change password
+        if (otpVerification.getAttempts() >= otpVerification.getMaxAttempts()) {
+            throw new InvalidOtpException("Maximum OTP attempts exceeded");
+        }
+
+        boolean otpMatches = passwordEncoder.matches(requestDto.getOtp(), otpVerification.getOtpHash());
+
+        if (!otpMatches) {
+            otpVerification.setAttempts(otpVerification.getAttempts() + 1);
+            otpVerificationRepository.save(otpVerification);
+            throw new InvalidOtpException("Invalid OTP");
+        }
+
         user.setPasswordHash(passwordEncoder.encode(requestDto.getNewPassword()));
 
         otpVerification.setVerifiedAt(LocalDateTime.now());
-
         userRepository.save(user);
         otpVerificationRepository.save(otpVerification);
     }
@@ -224,7 +245,6 @@ public class AuthServiceImpl implements AuthService {
 
         String userName = authentication.getName();
 
-        // Find user
         User user = userRepository.findByUserName(userName)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -247,23 +267,4 @@ public class AuthServiceImpl implements AuthService {
         return String.format("%06d", new SecureRandom().nextInt(1_000_000));
     }
 
-    private String hashToken(String token) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(token.getBytes(StandardCharsets.UTF_8));
-
-            StringBuilder hexString = new StringBuilder();
-
-            for (byte b : hash) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) {
-                    hexString.append('0');
-                }
-                hexString.append(hex);
-            }
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 algorithm not available", e);
-        }
-    }
 }

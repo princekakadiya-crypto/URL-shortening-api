@@ -1,15 +1,19 @@
 package com.tss.URL_Shortening.exception;
 
 import com.tss.URL_Shortening.error.ErrorResponseDto;
+import com.tss.URL_Shortening.error.ErrorValidationResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -58,6 +62,27 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND
         );
     }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorValidationResponse> handleValidationException(MethodArgumentNotValidException exception,HttpServletRequest request) {
+
+        Map<String, String> errors = new HashMap<>();
+        exception.getBindingResult().getFieldErrors().forEach(error -> {
+            errors.put(error.getField(), error.getDefaultMessage());
+        });
+
+        ErrorValidationResponse response = new ErrorValidationResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Validation Failed",
+                LocalDateTime.now(),
+                errors
+        );
+        return  new ResponseEntity<>(
+                response,
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
 
     @ExceptionHandler(DuplicateResourceException.class)
     public ResponseEntity<ErrorResponseDto> duplicateResourceException(DuplicateResourceException duplicateResourceException, HttpServletRequest request){

@@ -1,11 +1,9 @@
 package com.tss.URL_Shortening.service;
 
-import com.tss.URL_Shortening.dto.report.AdminOverviewReportDto;
-import com.tss.URL_Shortening.dto.report.AdminUrlReportDto;
-import com.tss.URL_Shortening.dto.report.AdminUserReportDto;
-import com.tss.URL_Shortening.dto.report.MyUrlReportDto;
+import com.tss.URL_Shortening.dto.report.*;
 import com.tss.URL_Shortening.entity.User;
 import com.tss.URL_Shortening.exception.ResourceNotFoundException;
+import com.tss.URL_Shortening.repository.PurchaseRepository;
 import com.tss.URL_Shortening.repository.ShortUrlRepository;
 import com.tss.URL_Shortening.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -17,6 +15,7 @@ public class ReportServiceImpl implements ReportService{
 
     private final ShortUrlRepository shortUrlRepository;
     private final UserRepository userRepository;
+    private final PurchaseRepository purchaseRepository;
 
     @Override
     public MyUrlReportDto getMyUrlReport(String adminUserName) {
@@ -27,6 +26,15 @@ public class ReportServiceImpl implements ReportService{
         MyUrlReportDto reportDto=shortUrlRepository.getMyUrlReport(user.getUserId());
 
         return reportDto;
+    }
+
+    @Override
+    public MyPurchaseReportDto getMyPurchaseReport(String userName) {
+
+        User user = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        return purchaseRepository.getMyPurchaseReport(user.getUserId());
     }
 
     @Override

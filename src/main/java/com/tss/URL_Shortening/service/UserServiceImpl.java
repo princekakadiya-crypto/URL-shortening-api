@@ -6,6 +6,7 @@ import com.tss.URL_Shortening.dto.user.UserResponseDto;
 import com.tss.URL_Shortening.entity.Image;
 import com.tss.URL_Shortening.entity.User;
 import com.tss.URL_Shortening.enums.ImageType;
+import com.tss.URL_Shortening.exception.InvalidOperationException;
 import com.tss.URL_Shortening.exception.ResourceNotFoundException;
 import com.tss.URL_Shortening.mapper.UserMapper;
 import com.tss.URL_Shortening.repository.ImageRepository;
@@ -26,8 +27,6 @@ public class UserServiceImpl implements UserService{
     private final UserMapper userMapper;
     private final CloudinaryService cloudinaryService;
     private final ImageRepository imageRepository;
-
-
 
     @Override
     public Optional<User> findByName(String name) {
@@ -50,6 +49,12 @@ public class UserServiceImpl implements UserService{
 
         User user = userRepository.findByUserName(userName)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        boolean usernameExists = userRepository.existsByUserNameAndUserIdNot(requestDto.getUserName(), user.getUserId());
+        if (usernameExists) {
+            throw new InvalidOperationException("Username already exists");
+        }
+
 
         user.setUserName(requestDto.getUserName());
         user.setUpdatedAt(LocalDateTime.now());

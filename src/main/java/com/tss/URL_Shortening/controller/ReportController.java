@@ -1,9 +1,6 @@
 package com.tss.URL_Shortening.controller;
 
-import com.tss.URL_Shortening.dto.report.AdminOverviewReportDto;
-import com.tss.URL_Shortening.dto.report.AdminUrlReportDto;
-import com.tss.URL_Shortening.dto.report.AdminUserReportDto;
-import com.tss.URL_Shortening.dto.report.MyUrlReportDto;
+import com.tss.URL_Shortening.dto.report.*;
 import com.tss.URL_Shortening.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,12 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/reports")
 public class ReportController {
 
     private final ReportService reportService;
 
-    @GetMapping("/reports/my/urls")
+    @GetMapping("/my/urls")
     public ResponseEntity<MyUrlReportDto> getMyUrlReport(Authentication authentication) {
 
         String adminUserName= authentication.getName();
@@ -28,27 +25,12 @@ public class ReportController {
         );
     }
 
-    @GetMapping("/admin/reports/overview")
-    public ResponseEntity<AdminOverviewReportDto> getAdminOverviewReport() {
+    @GetMapping("/my/purchases")
+    public ResponseEntity<MyPurchaseReportDto> getMyPurchaseReport(Authentication authentication) {
 
         return ResponseEntity.ok(
-                reportService.getAdminOverviewReport()
+                reportService.getMyPurchaseReport(authentication.getName())
         );
     }
 
-    @GetMapping("/admin/reports/users")
-    public ResponseEntity<AdminUserReportDto> getAdminUserReport() {
-
-        return ResponseEntity.ok(
-                reportService.getAdminUserReport()
-        );
-    }
-
-    @GetMapping("/admin/reports/urls")
-    public ResponseEntity<AdminUrlReportDto> getAdminUrlReport() {
-
-        return ResponseEntity.ok(
-                reportService.getAdminUrlReport()
-        );
-    }
 }
