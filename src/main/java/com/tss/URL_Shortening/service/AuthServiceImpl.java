@@ -5,14 +5,12 @@ import com.tss.URL_Shortening.dto.auth.*;
 import com.tss.URL_Shortening.dto.user.UserResponseDto;
 import com.tss.URL_Shortening.entity.OtpVerification;
 import com.tss.URL_Shortening.entity.Role;
-import com.tss.URL_Shortening.entity.TokenBlacklist;
 import com.tss.URL_Shortening.entity.User;
 import com.tss.URL_Shortening.enums.OtpPurpose;
 import com.tss.URL_Shortening.exception.*;
 import com.tss.URL_Shortening.mapper.UserMapper;
 import com.tss.URL_Shortening.repository.OtpVerificationRepository;
 import com.tss.URL_Shortening.repository.RoleRepository;
-import com.tss.URL_Shortening.repository.TokenBlacklistRepository;
 import com.tss.URL_Shortening.repository.UserRepository;
 import com.tss.URL_Shortening.security.JwtTokenProvider;
 import jakarta.transaction.Transactional;
@@ -43,7 +41,6 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final OtpVerificationRepository otpVerificationRepository;
     private final EmailService emailService;
-    private final TokenBlacklistRepository tokenBlacklistRepository;
     private final SystemConfigCache configCache;
     private final TokenBlacklistRedisService tokenBlacklistRedisService;
 
