@@ -11,13 +11,13 @@ import java.util.List;
 public interface AdminUrlService {
 
 
-
-        PageDto<ShortUrlResponseDto> getAllUrls(Pageable pageable);
-
-        ShortUrlResponseDto getUrlById(Long id);
-
-        void deleteUrl(Long id);
-
-        ShortUrlResponseDto restoreUrl(Long id);
+//
+//        PageDto<ShortUrlResponseDto> getAllUrls(Pageable pageable);
+//
+//        ShortUrlResponseDto getUrlById(Long id);
+//
+//        void deleteUrl(Long id);
+//
+//        ShortUrlResponseDto restoreUrl(Long id);
 
 }

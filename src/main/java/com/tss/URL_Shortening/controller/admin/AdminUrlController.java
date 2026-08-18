@@ -17,32 +17,32 @@ import java.util.List;
 @AllArgsConstructor
 public class AdminUrlController {
 
-
-        private final AdminUrlService adminUrlService;
-
-        @GetMapping
-        public ResponseEntity<PageDto<ShortUrlResponseDto>> getAllUrls(Pageable pageable) {
-
-            return ResponseEntity.ok(adminUrlService.getAllUrls(pageable));
-        }
-
-        @GetMapping("/{id}")
-        public ResponseEntity<ShortUrlResponseDto> getUrlById(@PathVariable Long id) {
-
-            return ResponseEntity.ok(adminUrlService.getUrlById(id));
-        }
-
-        @DeleteMapping("/{id}")
-        public ResponseEntity<Void> deleteUrl(@PathVariable Long id) {
-
-            adminUrlService.deleteUrl(id);
-            return ResponseEntity.noContent().build();
-        }
-
-        @PatchMapping("/{id}/restore")
-        public ResponseEntity<ShortUrlResponseDto> restoreUrl(@PathVariable Long id) {
-
-            return ResponseEntity.ok(adminUrlService.restoreUrl(id));
-        }
+//
+//        private final AdminUrlService adminUrlService;
+//
+//        @GetMapping
+//        public ResponseEntity<PageDto<ShortUrlResponseDto>> getAllUrls(Pageable pageable) {
+//
+//            return ResponseEntity.ok(adminUrlService.getAllUrls(pageable));
+//        }
+//
+//        @GetMapping("/{id}")
+//        public ResponseEntity<ShortUrlResponseDto> getUrlById(@PathVariable Long id) {
+//
+//            return ResponseEntity.ok(adminUrlService.getUrlById(id));
+//        }
+//
+//        @DeleteMapping("/{id}")
+//        public ResponseEntity<Void> deleteUrl(@PathVariable Long id) {
+//
+//            adminUrlService.deleteUrl(id);
+//            return ResponseEntity.noContent().build();
+//        }
+//
+//        @PatchMapping("/{id}/restore")
+//        public ResponseEntity<ShortUrlResponseDto> restoreUrl(@PathVariable Long id) {
+//
+//            return ResponseEntity.ok(adminUrlService.restoreUrl(id));
+//        }
 
 }

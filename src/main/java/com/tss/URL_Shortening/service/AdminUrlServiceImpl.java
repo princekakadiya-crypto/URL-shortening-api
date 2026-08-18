@@ -25,77 +25,77 @@ import java.util.List;
 @AllArgsConstructor
 public class AdminUrlServiceImpl implements AdminUrlService{
 
-
-        private final ShortUrlMapper shortUrlMapper;
-        private final ShortUrlRepository shortUrlRepository;
-
-        @Override
-        public PageDto<ShortUrlResponseDto> getAllUrls(Pageable pageable) {
-
-            Page<ShortUrl> shortUrls=shortUrlRepository.findAllByDeletedFalse(pageable);
-
-            List<ShortUrlResponseDto> responseDtos=new ArrayList<>();
-
-            for (ShortUrl shortUrl:shortUrls){
-                ShortUrlResponseDto dto= shortUrlMapper.toDto(shortUrl);
-                responseDtos.add(dto);
-            }
-
-            PageDto<ShortUrlResponseDto> pageDto = new PageDto<>();
-
-            pageDto.setContent(responseDtos);
-            pageDto.setCurrentPage(shortUrls.getNumber());
-            pageDto.setPageSize(shortUrls.getSize());
-            pageDto.setTotalPages(shortUrls.getTotalPages());
-            pageDto.setTotalElements(shortUrls.getTotalElements());
-            pageDto.setFirst(shortUrls.isFirst());
-            pageDto.setLast(shortUrls.isLast());
-            pageDto.setEmpty(shortUrls.isEmpty());
-
-            return pageDto;
-        }
-
-        @Override
-        @Transactional
-        public ShortUrlResponseDto getUrlById(Long id) {
-
-            ShortUrl shortUrl = shortUrlRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("URL not found"));
-
-            return shortUrlMapper.toDto(shortUrl);
-        }
-
-        @Override
-        @Transactional
-        public void deleteUrl(Long id) {
-
-            ShortUrl shortUrl = shortUrlRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("URL not found"));
-
-            if (shortUrl.isDeleted()) {
-                throw new InvalidOperationException("URL is already deleted");
-            }
-
-            shortUrl.setDeleted(true);
-            shortUrlRepository.save(shortUrl);
-        }
-
-        @Override
-        @Transactional
-        public ShortUrlResponseDto restoreUrl(Long id) {
-
-            ShortUrl shortUrl = shortUrlRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("URL not found"));
-
-            if (!shortUrl.isDeleted()) {
-                throw new InvalidOperationException("URL is not deleted");
-            }
-
-            shortUrl.setDeleted(false);
-
-            ShortUrl savedUrl = shortUrlRepository.save(shortUrl);
-            return shortUrlMapper.toDto(savedUrl);
-        }
+//
+//        private final ShortUrlMapper shortUrlMapper;
+//        private final ShortUrlRepository shortUrlRepository;
+//
+//        @Override
+//        public PageDto<ShortUrlResponseDto> getAllUrls(Pageable pageable) {
+//
+//            Page<ShortUrl> shortUrls=shortUrlRepository.findAllByDeletedFalse(pageable);
+//
+//            List<ShortUrlResponseDto> responseDtos=new ArrayList<>();
+//
+//            for (ShortUrl shortUrl:shortUrls){
+//                ShortUrlResponseDto dto= shortUrlMapper.toDto(shortUrl);
+//                responseDtos.add(dto);
+//            }
+//
+//            PageDto<ShortUrlResponseDto> pageDto = new PageDto<>();
+//
+//            pageDto.setContent(responseDtos);
+//            pageDto.setCurrentPage(shortUrls.getNumber());
+//            pageDto.setPageSize(shortUrls.getSize());
+//            pageDto.setTotalPages(shortUrls.getTotalPages());
+//            pageDto.setTotalElements(shortUrls.getTotalElements());
+//            pageDto.setFirst(shortUrls.isFirst());
+//            pageDto.setLast(shortUrls.isLast());
+//            pageDto.setEmpty(shortUrls.isEmpty());
+//
+//            return pageDto;
+//        }
+//
+//        @Override
+//        @Transactional
+//        public ShortUrlResponseDto getUrlById(Long id) {
+//
+//            ShortUrl shortUrl = shortUrlRepository.findById(id)
+//                    .orElseThrow(() -> new ResourceNotFoundException("URL not found"));
+//
+//            return shortUrlMapper.toDto(shortUrl);
+//        }
+//
+//        @Override
+//        @Transactional
+//        public void deleteUrl(Long id) {
+//
+//            ShortUrl shortUrl = shortUrlRepository.findById(id)
+//                    .orElseThrow(() -> new ResourceNotFoundException("URL not found"));
+//
+//            if (shortUrl.isDeleted()) {
+//                throw new InvalidOperationException("URL is already deleted");
+//            }
+//
+//            shortUrl.setDeleted(true);
+//            shortUrlRepository.save(shortUrl);
+//        }
+//
+//        @Override
+//        @Transactional
+//        public ShortUrlResponseDto restoreUrl(Long id) {
+//
+//            ShortUrl shortUrl = shortUrlRepository.findById(id)
+//                    .orElseThrow(() -> new ResourceNotFoundException("URL not found"));
+//
+//            if (!shortUrl.isDeleted()) {
+//                throw new InvalidOperationException("URL is not deleted");
+//            }
+//
+//            shortUrl.setDeleted(false);
+//
+//            ShortUrl savedUrl = shortUrlRepository.save(shortUrl);
+//            return shortUrlMapper.toDto(savedUrl);
+//        }
 
 
 }
