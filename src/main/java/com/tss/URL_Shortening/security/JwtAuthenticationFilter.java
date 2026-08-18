@@ -1,5 +1,6 @@
 package com.tss.URL_Shortening.security;
 
+import com.tss.URL_Shortening.service.TokenBlacklistRedisService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,10 +20,12 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtTokenProvider jwtTokenProvider;
     private UserDetailsService userDetailsService;
-    public JwtAuthenticationFilter (JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService) {
+    private final TokenBlacklistRedisService tokenBlacklistRedisService;
+    public JwtAuthenticationFilter (JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService,TokenBlacklistRedisService tokenBlacklistRedisService) {
         super();
         this.jwtTokenProvider= jwtTokenProvider;
         this.userDetailsService = userDetailsService;
+        this.tokenBlacklistRedisService=tokenBlacklistRedisService;
     }
 
     @Override
@@ -30,17 +33,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // get JWT token from http request
         String token = getTakenFromRequest(request);
-        // validate token
-        if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
-            // get username from token
-            String username = jwtTokenProvider.getUsername(token);
-            // load the user associated with token
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        if (StringUtils.hasText(token)) {
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities());
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            // Check Redis blacklist
+            if (tokenBlacklistRedisService.isBlacklisted(token)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token has been logged out");
+                return;
+            }
+
+            // Validate JWT
+            if (jwtTokenProvider.validateToken(token)) {
+
+                // Get username from token
+                String username = jwtTokenProvider.getUsername(token);
+
+                // Load user details
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
         }
         filterChain.doFilter(request, response);
 
