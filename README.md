@@ -20,3 +20,11 @@
     Purchase QR CODE
  
  
+## BusinessOffers APIs
+- GET /api/v1/offers
+   Get All Offers
+- POST /api/v1/offers
+   Create New BusinessOffer
+- GET /api/v1/offers/{ID}
+   Get Bussiness Offer By ID
+
