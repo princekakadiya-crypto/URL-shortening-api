@@ -23,7 +23,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PurchaseController {
 
-
         private final PurchaseService purchaseService;
         private final ShortUrlService shortUrlService;
         private  final QrCodeService qrCodeService;
@@ -54,8 +53,6 @@ public class PurchaseController {
             Long userId = user.get().getUserId();
 
 
-
-
             return ResponseEntity.ok(
                     purchaseService.getPurchasesByUser(userId));
         }
@@ -70,9 +67,4 @@ public class PurchaseController {
 
             return ResponseEntity.ok(qrLink);
         }
-
-
-
-
-
 }
