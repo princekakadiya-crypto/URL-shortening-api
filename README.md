@@ -43,3 +43,12 @@
   Redirect To ORIGINAL URL
 - POST /api/v1/urls/qr/{urlid}
   Get QR Code 
+
+
+## Payment APIs
+- POST /api/v1/payments
+  Create Payment 
+- PUT /api/v1/payments/{paymentId}/success
+  Make Payment SUcess
+- PUT /api/v1/payments/{paymentId}/failed
+  Makew Payment fAiled
