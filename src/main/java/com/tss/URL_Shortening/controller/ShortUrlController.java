@@ -16,7 +16,7 @@ import java.net.URI;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/urls")
+@RequestMapping("/api/v1/urls")
 @RequiredArgsConstructor
 public class ShortUrlController {
 
@@ -27,7 +27,7 @@ public class ShortUrlController {
         private final ShortUrlService shortUrlService;
         private  final UserService userService;
 
-        @PostMapping("/shorten")
+        @PostMapping
         public ResponseEntity<ShortUrlResponseDto> shortenUrl(
                 @RequestBody CreateShortUrlRequestDto request, Authentication authentication) {
 

@@ -35,3 +35,11 @@
    Delete User By ID
 - GET /api/v1/admin/users/{id}
    Get User By ID
+
+## Short URL APIs
+- POST /api/v1/urls 
+  Create Short URL 
+- POST /api/v1/urls/{shortcode}
+  Redirect To ORIGINAL URL
+- POST /api/v1/urls/qr/{urlid}
+  Get QR Code 
