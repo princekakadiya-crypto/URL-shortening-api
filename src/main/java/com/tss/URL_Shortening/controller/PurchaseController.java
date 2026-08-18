@@ -19,7 +19,7 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/api/purchases")
+@RequestMapping("/api/v1/purchases")
 @RequiredArgsConstructor
 public class PurchaseController {
 

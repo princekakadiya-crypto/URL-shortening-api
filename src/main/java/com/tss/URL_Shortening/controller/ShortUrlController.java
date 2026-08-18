@@ -16,7 +16,7 @@ import java.net.URI;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/urls")
+@RequestMapping("/api/v1/urls")
 @RequiredArgsConstructor
 public class ShortUrlController {
 

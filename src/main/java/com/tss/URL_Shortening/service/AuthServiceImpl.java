@@ -28,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -44,6 +45,7 @@ public class AuthServiceImpl implements AuthService {
     private final EmailService emailService;
     private final TokenBlacklistRepository tokenBlacklistRepository;
     private final SystemConfigCache configCache;
+    private final TokenBlacklistRedisService tokenBlacklistRedisService;
 
     @Override
     @Transactional
@@ -135,45 +137,24 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @Transactional
     public void logout(String token) {
 
-        if (token == null || token.isBlank()) {
-            throw new InvalidCredentialException("Token is required");
-        }
-
-        // Remove "Bearer " if it is passed with the token
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
-
-        // Validate JWT
+        // Validate JWT first
         if (!jwtTokenProvider.validateToken(token)) {
-            throw new InvalidCredentialException("Invalid or expired token");
+            throw new InvalidOperationException("Invalid or expired token");
         }
 
-        // Get user from JWT
-        String username = jwtTokenProvider.getUsername(token);
+        // Get expiration from your existing method
+        LocalDateTime expiration = jwtTokenProvider.getExpirationDateFromToken(token);
 
-        User user = userRepository
-                .findByUserName(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        // Calculate remaining time
+        long remainingSeconds = Duration.between(LocalDateTime.now(), expiration).getSeconds();
 
-        // Hash token before storing
-        String tokenHash = hashToken(token);
-
-        // Prevent duplicate blacklist entry
-        if (tokenBlacklistRepository.existsByTokenHash(tokenHash)) {
+        if (remainingSeconds <= 0) {
             return;
         }
-
-        TokenBlacklist tokenBlacklist = new TokenBlacklist();
-        tokenBlacklist.setTokenHash(tokenHash);
-        tokenBlacklist.setExpiresAt(jwtTokenProvider.getExpirationDateFromToken(token));
-        tokenBlacklist.setBlacklistedAt(LocalDateTime.now());
-        tokenBlacklist.setUser(user);
-
-        tokenBlacklistRepository.save(tokenBlacklist);
+        // Add token to Redis blacklist
+        tokenBlacklistRedisService.blacklistToken(token, Duration.ofSeconds(remainingSeconds));
     }
 
     @Override

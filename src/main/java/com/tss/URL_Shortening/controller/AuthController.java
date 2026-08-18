@@ -50,7 +50,9 @@ public class AuthController {
             throw new InvalidCredentialException("Authorization token is required");
         }
 
-        authService.logout(authorizationHeader);
+        String token = authorizationHeader.substring(7);
+
+        authService.logout(token);
 
         return ResponseEntity.ok("Logout successful");
     }
