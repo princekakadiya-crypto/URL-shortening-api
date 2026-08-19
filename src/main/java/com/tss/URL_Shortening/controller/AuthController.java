@@ -27,6 +27,14 @@ public class AuthController {
         );
     }
 
+    @PostMapping("/resend-verification-otp")
+    public ResponseEntity<String> resendVerificationOtp(@Valid @RequestBody ResendOtpRequestDto request) {
+
+        authService.resendVerificationOtp(request);
+
+        return ResponseEntity.ok("Verification OTP sent successfully");
+    }
+
     @PostMapping("/verify-email")
     public ResponseEntity<String> verifyEmail(@Valid @RequestBody VerifyEmailRequestDto requestDto) {
 
