@@ -1,5 +1,6 @@
 package com.tss.URL_Shortening.service;
 
+import com.tss.URL_Shortening.cache.SystemConfigCache;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -13,9 +14,10 @@ public class EmailServiceImpl implements EmailService {
 
     @Value("${spring.mail.username}")
     private String fromEmail;
-
-    public EmailServiceImpl(JavaMailSender mailSender) {
+    private final SystemConfigCache systemConfigCache;
+    public EmailServiceImpl(JavaMailSender mailSender,SystemConfigCache systemConfigCache) {
         this.mailSender = mailSender;
+        this.systemConfigCache=systemConfigCache;
     }
 
     @Override
@@ -29,13 +31,13 @@ public class EmailServiceImpl implements EmailService {
 
                 %s
 
-                This OTP will expire in 10 minutes.
+                This OTP will expire in %s minutes.
 
                 If you did not create this account, please ignore this email.
 
                 Regards,
                 URL Shortening Team
-                """.formatted(userName, otp);
+                """.formatted(userName, otp,systemConfigCache.get("OTP_EXPIRY_MINUTES"));
 
         sendEmail(email, subject, body);
     }
@@ -51,13 +53,13 @@ public class EmailServiceImpl implements EmailService {
 
                 %s
 
-                This OTP will expire in 10 minutes.
+                This OTP will expire in %s minutes.
 
                 If you did not request a password reset, please ignore this email.
 
                 Regards,
                 URL Shortening Team
-                """.formatted(userName, otp);
+                """.formatted(userName, otp,systemConfigCache.get("OTP_EXPIRY_MINUTES"));
 
         sendEmail(email, subject, body);
     }

@@ -33,7 +33,7 @@ public class ShortUrl {
         private User user;
 
         @Column
-        private Integer visitsLimit=100;
+        private Integer visitsLimit;
 
         @Column
         private Integer visitsCount;

@@ -1,5 +1,6 @@
 package com.tss.URL_Shortening.service;
 
+import com.tss.URL_Shortening.cache.SystemConfigCache;
 import com.tss.URL_Shortening.dto.url.CreateShortUrlRequestDto;
 import com.tss.URL_Shortening.dto.url.ShortUrlResponseDto;
 import com.tss.URL_Shortening.entity.ShortUrl;
@@ -20,6 +21,7 @@ public class ShortUrlServiceImpl implements ShortUrlService{
 
         private final ShortUrlRepository shortUrlRepository;
         private final UserRepository userRepository;
+        private final SystemConfigCache systemConfigCache;
 
 
         // =========================================================
@@ -92,6 +94,7 @@ public class ShortUrlServiceImpl implements ShortUrlService{
             shortUrl.setOriginalUrl(request.getOriginalUrl());
             shortUrl.setShortCode(shortCode);
             shortUrl.setUser(user);
+            shortUrl.setVisitsLimit(systemConfigCache.getInt("DEFAULT_VISITOR_LIMIT"));
 
 
             // -----------------------------------------------------

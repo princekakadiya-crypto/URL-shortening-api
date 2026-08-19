@@ -263,6 +263,34 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
     }
 
+    @Override
+    public void resendVerificationOtp(ResendOtpRequestDto requestDto) {
+
+        User user = userRepository.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (user.getEmailVerified()) {
+            throw new InvalidOperationException("Email is already verified");
+        }
+
+        String otp = generateOtp();
+
+        String otpHash = passwordEncoder.encode(otp);
+
+        OtpVerification otpVerification = new OtpVerification();
+
+        otpVerification.setUser(user);
+        otpVerification.setOtpHash(otpHash);
+        otpVerification.setPurpose(OtpPurpose.EMAIL_VERIFICATION);
+        otpVerification.setAttempts(0);
+        otpVerification.setMaxAttempts(configCache.getInt("OTP_MAX_ATTEMPTS"));
+        otpVerification.setCreatedAt(LocalDateTime.now());
+        otpVerification.setExpiresAt(LocalDateTime.now().plusMinutes(configCache.getInt("OTP_EXPIRY_MINUTES")));
+
+        otpVerificationRepository.save(otpVerification);
+        emailService.sendEmailVerificationOtp(user.getEmail(), user.getUserName(), otp);
+    }
+
     private String generateOtp() {
         return String.format("%06d", new SecureRandom().nextInt(1_000_000));
     }

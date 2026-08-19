@@ -1,5 +1,6 @@
 package com.tss.URL_Shortening.security;
 
+import com.tss.URL_Shortening.exception.InvalidCredentialException;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import io.jsonwebtoken.io.Decoders;
@@ -44,15 +45,15 @@ public class JwtTokenProvider {
             Jwts.parser().verifyWith(key()).build().parseSignedClaims(token);
             return true;
         } catch (MalformedJwtException ex) {
-            throw new RuntimeException("Invalid JWT token");
+            throw new InvalidCredentialException("Invalid JWT token");
         } catch (ExpiredJwtException ex) {
-            throw new RuntimeException("Expired JWT token");
+            throw new InvalidCredentialException("Expired JWT token");
         } catch (UnsupportedJwtException ex) {
-            throw new RuntimeException("Unsupported JWT token");
+            throw new InvalidCredentialException("Unsupported JWT token");
         } catch (IllegalArgumentException ex) {
-            throw new RuntimeException("JWT claims string is empty.");
+            throw new InvalidCredentialException("JWT claims string is empty.");
         } catch (Exception e) {
-            throw new RuntimeException("Invalid Credentials");
+            throw new InvalidCredentialException("Invalid Credentials");
         }
     }
 
