@@ -27,8 +27,8 @@ public class AuthController {
         );
     }
 
-    @GetMapping("/verify-email")
-    public ResponseEntity<String> verifyEmail(@Valid @RequestParam VerifyEmailRequestDto requestDto) {
+    @PostMapping("/verify-email")
+    public ResponseEntity<String> verifyEmail(@Valid @RequestBody VerifyEmailRequestDto requestDto) {
 
         authService.verifyEmail(requestDto);
 

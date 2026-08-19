@@ -32,13 +32,8 @@ public class TokenBlacklistRedisService {
         } catch (RedisConnectionFailureException e) {
 
             log.error("Redis connection failed while blacklisting JWT", e);
-
-            throw new IllegalStateException("Logout service is temporarily unavailable");
-
         } catch (RedisSystemException e) {
             log.error("Redis system error while blacklisting JWT", e);
-
-            throw new IllegalStateException("Logout service is temporarily unavailable");
         }
     }
 
@@ -51,13 +46,11 @@ public class TokenBlacklistRedisService {
 
         } catch (RedisConnectionFailureException e) {
             log.error("Redis connection failed while checking JWT blacklist", e);
-            // Fail-closed
-            throw new IllegalStateException("Authentication service is temporarily unavailable");
+            return false;
 
         } catch (RedisSystemException e) {
             log.error("Redis system error while checking JWT blacklist", e);
-            // Fail-closed
-            throw new IllegalStateException("Authentication service is temporarily unavailable");
+            return false;
         }
     }
 }
