@@ -3,6 +3,7 @@ package com.tss.URL_Shortening.security;
 import com.tss.URL_Shortening.entity.User;
 import com.tss.URL_Shortening.entity.Role;
 import com.tss.URL_Shortening.exception.InvalidOperationException;
+import com.tss.URL_Shortening.exception.ResourceNotFoundException;
 import com.tss.URL_Shortening.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,7 +24,7 @@ public class CustomUserDetailService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user=userRepository.findByUserName(username).orElseThrow(
-                ()->new RuntimeException("User Not Found")
+                ()->new ResourceNotFoundException("User Not Found")
         );
 
         if (!user.getEmailVerified()) {
